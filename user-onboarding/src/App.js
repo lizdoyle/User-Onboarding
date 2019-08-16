@@ -1,13 +1,13 @@
 import React from 'react';
 
 
-import Form from './components/Form';
+import UserForm from './components/Form';
 import './App.css';
 
 const App = () => {
   return (
     <div className="App">
-      <Form />
+      <UserForm />
     </div>
   );
 }
