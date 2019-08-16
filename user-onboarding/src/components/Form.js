@@ -3,20 +3,19 @@ import {Form, Field, withFormik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 
-const UserForm = () => {
+const UserForm = ({ errors, touched, values, status}) => {
 
-const [users, setUserss] = useState([]);
+const [users, setUsers] = useState([]);
 
 console.log(users)
 
 useEffect( () => {
 
+  if (status) {
+    setUsers([...users, status]);
+  }
 
-
-}
-
-
-)
+}, [status]);
 
   return (
     <div className="userForm">
@@ -28,6 +27,9 @@ useEffect( () => {
           placeholder="First Name"
 
         />
+        {touched.firstName && errors.firstName && (
+          <p className="error">{errors.firstName}</p>
+        )}
 
         <Field
           component="input"
@@ -36,6 +38,9 @@ useEffect( () => {
           placeholder="Last Name"
 
         />
+        {touched.lastName && errors.lastName && (
+          <p className="error">{errors.lastName}</p>
+        )}
 
         <Field
           component="input"
@@ -44,6 +49,9 @@ useEffect( () => {
           placeholder="Username"
 
         />
+        {touched.username && errors.username && (
+          <p className="error">{errors.username}</p>
+        )}
 
         <Field
           component="input"
@@ -52,6 +60,9 @@ useEffect( () => {
           placeholder="Email"
 
         />
+        {touched.email && errors.email && (
+          <p className="error">{errors.email}</p>
+        )}
 
         <Field
           component="input"
@@ -60,6 +71,9 @@ useEffect( () => {
           placeholder="Password"
 
         />
+        {touched.password && errors.password && (
+          <p className="error">{errors.password}</p>
+        )}
 
         <label className="check">
           Terms of Service
@@ -75,8 +89,8 @@ useEffect( () => {
       </Form>
 
       {users.map(user => {
-        <p key={user.name}>{user.username}</p>
-      })};
+        <p key={user.id}>{user.name}</p>
+      })}
 
      </div>
 
@@ -96,23 +110,35 @@ const formikOnChng = withFormik({
         password: password || "",
         box: box || false,
 
-      }
+      };
+  },
+
+  validationSchema: Yup.object().shape({
+    firstName: Yup.string().required("First Name is Required!"),
+    lastName: Yup.string().required("Last Name is Required!"),
+    username: Yup.string().required("Username is Required!"),
+    email: Yup.string().required("Email is Required!"),
+    password: Yup.string().required("Password is Required!"),
+    box: Yup.string().required("Please Accep the Terms of Service")
+
+
+  }),
+
+  handleSubmit(values, {setStatus, resetForm}) {
+    axios
+      .post("https://reqres.in/api/users", values)
+      .then(res => {
+        console.log("Success Message! ", res );
+        setStatus(res.data);
+        resetForm();
+      })
+      .catch(err => console.log("Error Message", err))
   }
 
-validationSchema: Yup.object().shape({
-  firstName: Yup.string().required("First Name is Required!"),
-  lastName: Yup.string().required("Last Name is Required!"),
-  username: Yup.string().required("Username is Required!"),
-  email: Yup.string().required("Email is Required!"),
-  password: Yup.string().required("Password is Required!"),
-  box: Yup.string().required("Please Accep the Terms of Service")
+});
 
-
-})
-
-  }
-)
+const UserFormWthFrmk = formikOnChng(UserForm);
 
 
 
-export default UserForm
+export default UserFormWthFrmk
